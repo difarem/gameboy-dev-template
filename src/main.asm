@@ -123,7 +123,7 @@ LoadTiles::
     ld  hl,HELLO_TILES
     ld  de,_VRAM
 
-    ld  bc,9*16     ; we have 9 tiles and each tile takes 16 bytes
+    ld  bc,HELLO_SIZE*16     ; we have 9 tiles and each tile takes 16 bytes
 LoadTiles_Loop:
     ld  a,[hl+]             ; get a byte from our tiles, and increment.
     ld  [de],a              ; put that byte in VRAM and

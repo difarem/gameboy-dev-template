@@ -9,6 +9,8 @@ FIXFLAGS = -v -p 0
 GFX = rgbgfx
 GFXFLAGS = -F
 
+GBA = mgba-qt
+
 SOURCES = src/header.asm src/main.asm
 
 IMAGES = gfx/hello_world.png
@@ -20,7 +22,7 @@ TILEMAPS = $(IMAGES:%.png=build/%.tilemap)
 TILESETS = $(IMAGES:%.png=build/%.2bpp)
 
 .PHONY: all
-all: ${TARGET}
+all: $(TARGET)
 
 build/%.o: src/%.asm $(TILEMAPS) $(TILESETS) build
 	$(ASM) $(ASMFLAGS) -o $@ $<
@@ -37,6 +39,10 @@ build:
 
 build/gfx: build
 	mkdir -p build/gfx
+
+.PHONY: run
+run: $(TARGET)
+	$(GBA) $<
 
 .PHONY: clean
 clean:
