@@ -85,7 +85,8 @@ Start::
     ldh [rLCDC],a       ; turn on the LCD, BG, etc
 
 MainLoop:
-    call WaitVBlank     ; wait for v-blank
+    call WaitVBlank     ; wait for v-blank, ensuring this loop is executed around 60 times per second
+    halt                ; the actual main loop would go here
 
     jr MainLoop
 
