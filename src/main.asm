@@ -17,6 +17,50 @@ INCLUDE "hardware.inc"
 ;***************************
 
 
+;****************
+;*  video data  *
+;****************
+
+;*************
+;*  tileset  *
+;*************
+
+HELLO_BLANK     EQU 0
+HELLO_H         EQU 1
+HELLO_E         EQU 2
+HELLO_L         EQU 3
+HELLO_O         EQU 4
+HELLO_W         EQU 5
+HELLO_R         EQU 6
+HELLO_D         EQU 7
+HELLO_BANG      EQU 8
+HELLO_SIZE      EQU 9
+
+    SECTION "Tiles", ROM0
+HELLO_TILES::
+    INCBIN "gfx/hello_world.2bpp"
+
+
+;*************
+;*  tilemap  *
+;*************
+
+    SECTION "Map",ROM0
+HELLO_MAP::
+    DB  HELLO_H
+    DB  HELLO_E
+    DB  HELLO_L
+    DB  HELLO_L
+    DB  HELLO_O
+    DB  HELLO_BLANK
+    DB  HELLO_W
+    DB  HELLO_O
+    DB  HELLO_R
+    DB  HELLO_L
+    DB  HELLO_D
+    DB  HELLO_BANG
+
+
 ;*******************
 ;*  program start  *
 ;*******************
@@ -60,25 +104,25 @@ WaitVBlank::
 
 
 ClearMap::
-    ld  hl,_SCRN0           ; loads the address of the bg map ($9800) into HL
-    ld  bc,32*32            ; since we have 32x32 tiles, we'll need a counter so we can clear all of them
-    ld  a,0                 ; load 0 into A (since our tile 0 is blank)
+    ld  hl,_SCRN0           ; load the address of the bg map ($9800) into HL
 
+    ld  bc,32*32            ; we have 32x32 tiles to clear, so we'll need a counter
 ClearMap_Loop:
-    ld  [hl+],a             ; load A into HL, then increment HL (the HL+)
+    ld  a,HELLO_BLANK       ; load our blank tile offset into A...
+    ld  [hl+],a             ; load A into the address at HL and increment HL
     dec bc                  ; decrement our counter
-    ld  a,b                 ; load B into A
-    or  c                   ; if B or C != 0
-    jr  nz,ClearMap_Loop    ; then loop
+    ld  a,b                 ; to see if BC is zero, we check both B...
+    or  c                   ; and C
+    jr  nz,ClearMap_Loop    ; loop while we don't reach zero
 
-    ret                     ; done
-    
+    ret                     ; done!
+
 
 LoadTiles::
     ld  hl,HELLO_TILES
     ld  de,_VRAM
-    ld  bc,9*16     ;we have 9 tiles and each tile takes 16 bytes
 
+    ld  bc,9*16     ; we have 9 tiles and each tile takes 16 bytes
 LoadTiles_Loop:
     ld  a,[hl+]             ; get a byte from our tiles, and increment.
     ld  [de],a              ; put that byte in VRAM and
@@ -94,8 +138,8 @@ LoadTiles_Loop:
 LoadMap::
     ld  hl,HELLO_MAP    ; our little map
     ld  de,_SCRN0       ; where our map goes
-    ld  c,12            ; since we are only loading 12 tiles
 
+    ld  c,12            ; since we are only loading 12 tiles
 LoadMap_Loop:
     ld  a,[hl+]             ; get a byte of the map and inc hl
     ld  [de],a              ; put the byte at de
@@ -104,25 +148,3 @@ LoadMap_Loop:
     jr  nz,LoadMap_Loop     ; and of the counter != 0 then loop
 
     ret                     ; done
-
-
-;****************
-;*  video data  *
-;****************
-
-;*************
-;*  tileset  *
-;*************
-
-    SECTION "Tiles", ROM0
-HELLO_TILES::
-    INCBIN "gfx/hello_world.2bpp"
-
-
-;*************
-;*  tilemap  *
-;*************
-
-    SECTION "Map",ROM0
-HELLO_MAP::
-    INCBIN "gfx/hello_world.tilemap"
